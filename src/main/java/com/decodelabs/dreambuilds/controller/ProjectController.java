@@ -50,4 +50,34 @@ public class ProjectController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> updateProject(
+            @PathVariable int id,
+            @Valid @RequestBody ProjectDto projectDto) {
+
+        ProjectDto updatedProject = projectService.updateProject(id, projectDto);
+
+        if (updatedProject == null) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "Project not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Project updated successfully");
+        response.put("data", updatedProject);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProject(@PathVariable int id) {
+        boolean isDeleted = projectService.deleteProject(id);
+
+        if (!isDeleted) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
