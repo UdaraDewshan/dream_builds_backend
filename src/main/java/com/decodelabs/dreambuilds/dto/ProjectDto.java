@@ -1,4 +1,4 @@
-package edu.icet.dto;
+package com.decodelabs.dreambuilds.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
