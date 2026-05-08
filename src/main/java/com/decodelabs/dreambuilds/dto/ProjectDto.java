@@ -12,10 +12,13 @@ import lombok.*;
 @ToString
 public class ProjectDto {
 
-    private int id;
+    private Long id;
 
     @NotBlank(message = "Project title cannot be empty")
     private String title;
+
+    @NotBlank(message = "Client name cannot be empty")
+    private String clientName;
 
     @NotNull(message = "Budget is required")
     @Min(value = 1, message = "Budget must be greater than zero")

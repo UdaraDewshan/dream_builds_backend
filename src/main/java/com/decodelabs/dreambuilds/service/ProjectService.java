@@ -1,40 +1,66 @@
 package com.decodelabs.dreambuilds.service;
 
 import com.decodelabs.dreambuilds.dto.ProjectDto;
+import com.decodelabs.dreambuilds.entity.ProjectEntity;
+import com.decodelabs.dreambuilds.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
 
-    private final List<ProjectDto> projectDatabase = new ArrayList<>();
+    private final ProjectRepository projectRepository;
+
+    public ProjectService(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
+    }
+
+    public ProjectDto createProject(ProjectDto projectDto) {
+        ProjectEntity entity = new ProjectEntity();
+        entity.setTitle(projectDto.getTitle());
+        entity.setClientName(projectDto.getClientName());
+        entity.setBudget(projectDto.getBudget());
+
+        ProjectEntity savedEntity = projectRepository.save(entity);
+        projectDto.setId(savedEntity.getId());
+        return projectDto;
+    }
 
     public List<ProjectDto> getAllProjects() {
-        return projectDatabase;
+        return projectRepository.findAll().stream().map(entity -> {
+            ProjectDto dto = new ProjectDto();
+            dto.setId(entity.getId());
+            dto.setTitle(entity.getTitle());
+            dto.setClientName(entity.getClientName());
+            dto.setBudget(entity.getBudget());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
-    private int currentId = 1;
+    public ProjectDto updateProject(Long id, ProjectDto projectDto) {
+        Optional<ProjectEntity> optionalEntity = projectRepository.findById(id);
 
-    public ProjectDto createProject(ProjectDto project) {
-        project.setId(currentId++);
-        projectDatabase.add(project);
-        return project;
-    }
+        if (optionalEntity.isPresent()) {
+            ProjectEntity entity = optionalEntity.get();
+            entity.setTitle(projectDto.getTitle());
+            entity.setClientName(projectDto.getClientName());
+            entity.setBudget(projectDto.getBudget());
 
-    public ProjectDto updateProject(int id, ProjectDto updatedProject) {
-        for (ProjectDto project : projectDatabase) {
-            if (project.getId() == id) {
-                project.setTitle(updatedProject.getTitle());
-                project.setBudget(updatedProject.getBudget());
-                return project;
-            }
+            ProjectEntity updatedEntity = projectRepository.save(entity);
+            projectDto.setId(updatedEntity.getId());
+            return projectDto;
         }
         return null;
     }
 
-    public boolean deleteProject(int id) {
-        return projectDatabase.removeIf(project -> project.getId() == id);
+    public boolean deleteProject(Long id) {
+        if (projectRepository.existsById(id)) {
+            projectRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
