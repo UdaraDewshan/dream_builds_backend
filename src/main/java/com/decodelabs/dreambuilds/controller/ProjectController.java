@@ -24,18 +24,14 @@ public class ProjectController {
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllProjects() {
         Map<String, Object> response = new HashMap<>();
-
         List<ProjectDto> projects = projectService.getAllProjects();
-
         response.put("status", "success");
         response.put("data", projects);
-
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createProject(@Valid @RequestBody ProjectDto projectDto) {
-
         if (projectDto.getTitle().equalsIgnoreCase("test")) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "Invalid Project Title. Cannot use 'test'.");
@@ -53,7 +49,7 @@ public class ProjectController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> updateProject(
-            @PathVariable int id,
+            @PathVariable Long id,
             @Valid @RequestBody ProjectDto projectDto) {
 
         ProjectDto updatedProject = projectService.updateProject(id, projectDto);
@@ -70,9 +66,8 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProject(@PathVariable int id) {
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         boolean isDeleted = projectService.deleteProject(id);
 
         if (!isDeleted) {
